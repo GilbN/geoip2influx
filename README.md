@@ -8,14 +8,9 @@
 [![](https://img.shields.io/badge/Blog-technicalramblings.com-blue?style=for-the-badge)](https://technicalramblings.com/)
 ***
 
-Adapted source: https://github.com/ratibor78/geostat
+A python script that will parse the nginx access.log and send geolocation metrics and log metrics to InfluxDB
 
 ![](https://i.imgur.com/mh0IhYA.jpg)
-
-
-
-The script will parse the access log for IPs and and convert them into geo metrics for InfluxDB. It will also send log metrics if enabled.
-
 ***
 
 ## Usage
@@ -103,6 +98,8 @@ services:
 
 ## Sending Nginx log metrics
 
+Nginx needs to be compiled with the geoip2 module: https://github.com/leev/ngx_http_geoip2_module
+
 1. Add the following to the http block in your `nginx.conf` file:
 
 ```nginx
@@ -155,3 +152,7 @@ Then use the `/config/log/nginx/access.log` file in the `NGINX_LOG_PATH` variabl
 **30.05.20** - Added logging. Use `-e GEOIP2INFLUX_LOG_LEVEL` to set the log level.
 
 **15.05.20** - Removed `GEOIP2_KEY` and `GEOIP_DB_PATH`variables. With commit https://github.com/linuxserver/docker-letsencrypt/commit/75b9685fdb3ec6edda590300f289b0e75dd9efd0 the letsencrypt container now natively supports downloading and updating(weekly) the GeoLite2-City database!
+
+***
+
+Adapted source: https://github.com/ratibor78/geostat

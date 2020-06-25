@@ -1,16 +1,11 @@
-# Geoip2Influx
+# [Geoip2Influx](https://github.com/gilbN/geoip2influx)
 
-<p align="center"></a>
-
-<a href="https://discord.gg/HSPa4cz" rel="noopener"><img class="alignnone" title="Geoip2Influx!" src="https://img.shields.io/badge/chat-Discord-blue.svg?style=for-the-badge&logo=discord" alt="" height="37" />
-</a>
-<a href="https://technicalramblings.com/" rel="noopener"><img class="alignnone" title="technicalramblings!" src="https://img.shields.io/badge/blog-technicalramblings.com-informational.svg?style=for-the-badge" alt="" height="37" />
-</a>
-<a href="https://hub.docker.com/r/gilbn/geoip2influx" rel="noopener"><img alt="Docker Cloud Build Status" src="https://img.shields.io/docker/cloud/build/gilbn/geoip2influx?style=for-the-badge&logo=docker" height="37">
-</a>
-<br />
-<br />
-
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/gilbn/geoip2influx?style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx/builds)
+[![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx)
+[![Docker Pulls](https://img.shields.io/docker/pulls/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx)
+[![GitHub](https://img.shields.io/github/license/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://github.com/gilbN/geoip2influx/blob/master/LICENSE)
+[![Discord](https://img.shields.io/discord/591352397830553601?color=blue&style=for-the-badge)](https://discord.gg/HSPa4cz)
+[![](https://img.shields.io/badge/Blog-technicalramblings.com-blue?style=for-the-badge)](https://technicalramblings.com/)
 ***
 
 Adapted source: https://github.com/ratibor78/geostat

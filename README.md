@@ -11,6 +11,8 @@
 A python script that will parse the nginx access.log and send geolocation metrics and log metrics to InfluxDB
 
 ![](https://i.imgur.com/mh0IhYA.jpg)
+
+For the linuxserver/letsencrypt docker mod, click here : https://github.com/gilbN/lsio-docker-mods/tree/master/letsencrypt/geoip2-nginx-stats
 ***
 
 ## Usage

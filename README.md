@@ -22,7 +22,7 @@ For the linuxserver/letsencrypt docker mod, click here : https://github.com/gilb
 These are the **default** values for all envs. 
 Add the ones that differ on your system. 
 
-| Environment Varialbe | Example Value | Description |
+| Environment Variable | Example Value | Description |
 | -------------------- | ------------- | ----------- |
 | NGINX_LOG_PATH | /config/log/nginx/access.log | Container path for Nginx logfile , defaults to the example. |
 | INFLUX_HOST | localhost | Host running InfluxDB. |

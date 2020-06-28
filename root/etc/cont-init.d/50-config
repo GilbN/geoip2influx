@@ -1,10 +1,5 @@
 #!/usr/bin/with-contenv bash
 
-echo '------------------------------------------------------------------------'
-echo '| Made by GilbN'
-echo '| Running installation of required modules for geoip2influx'
-echo '------------------------------------------------------------------------'
-
 echo -e "Variables set:\\n\
 NGINX_LOG_PATH=${NGINX_LOG_PATH}\\n\
 INFLUX_HOST=${INFLUX_HOST}\\n\

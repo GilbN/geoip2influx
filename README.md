@@ -35,8 +35,8 @@ Add the ones that differ on your system.
 | LOG_MEASUREMENT | nginx_access_logs | InfluxDB measurement name for nginx logs. Optional, defaults to the example. |
 | SEND_NGINX_LOGS | true | Set to `false` to disable nginx logs. Optional, defaults to `true`. |
 | GEOIP2INFLUX_LOG_LEVEL | info | Sets the log level in geoip2influx.log. Use `debug` for verbose logging Optional, defaults to info. |
-| INFLUX_RETENTION | 30d | Sets the retention for the database. Optional, defaults to example.|
-| INFLUX_SHARD | 2d | Set the shard for the database. Optional, defaults to example. |
+| INFLUX_RETENTION | 7d | Sets the retention for the database. Optional, defaults to example.|
+| INFLUX_SHARD | 1d | Set the shard for the database. Optional, defaults to example. |
 | MAXMINDDB_LICENSE_KEY | xxxxxxx | Add your Maxmind licence key |
 
 

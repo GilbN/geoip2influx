@@ -16,9 +16,7 @@ GEOIP2INFLUX_LOG_LEVEL=${GEOIP2INFLUX_LOG_LEVEL}\\n\
 MAXMINDDB_LICENSE_KEY=${MAXMINDDB_LICENSE_KEY}\\n"
 
 mkdir -p /config/geoip2db
-cp -f /geoip2influx/geoip2influx.py /config/geoip2db 
-chown -R abc:abc /config/geoip2db
-chmod +x /config/geoip2db/geoip2influx.py
+cp -f /geoip2influx/geoip2influx.py /config/geoip2db
 
 # create GeoIP2 folder symlink
 [[ -d /var/lib/libmaxminddb ]] && [[ ! -L /var/lib/libmaxminddb ]] && \
@@ -33,3 +31,8 @@ if [ -n "$MAXMINDDB_LICENSE_KEY" ]; then
     /etc/periodic/weekly/libmaxminddb
   fi
 fi
+
+# permissions
+chown -R abc:abc /config/geoip2db
+chmod +x /config/geoip2db/geoip2influx.py
+chmod -R 0644 /etc/logrotate.d

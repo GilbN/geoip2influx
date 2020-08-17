@@ -8,6 +8,7 @@ echo " ## Installing packages ## " && \
 apk add --no-cache --virtual=build-dependencies \
     python3 \
     py3-pip \
+    logrotate \
     libmaxminddb && \
 echo " ## Installing python modules ## " && \
 pip3 install --no-cache-dir -r requirements.txt

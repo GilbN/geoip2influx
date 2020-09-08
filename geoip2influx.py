@@ -1,20 +1,5 @@
 #! /usr/bin/env python3
 
-# Getting GEO information from Nginx access.log by IP's.
-# Alexey Nizhegolenko 2018
-# Parts added by Remko Lodder, 2019.
-# Added: IPv6 matching, make query based on geoip2 instead of
-# geoip, which is going away r.s.n.
-# GilbN 2020:
-    # Adapted to Python 3.
-    # Added enviroment variables for Docker.
-    # Added log metrics
-    # Added regex tester
-    # Added file path check
-    # Added logging
-    # Switched to pep8 style variables ect.
-    # Adapted to geoip2.
-
 from os.path import exists, isfile
 from os import environ as env, stat
 from platform import uname
@@ -73,18 +58,18 @@ def regex_tester(log_path, N):
             if re_ipv4.match(line):
                 regex = compile(r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - (?P<remote_user>.+) \[(?P<dateandtime>\d{2}\/[A-Z]{1}[a-z]{2}\/\d{4}:\d{2}:\d{2}:\d{2} ((\+|\-)\d{4}))\](["](?P<method>.+)) (?P<referrer>.+) ((?P<http_version>HTTP\/[1-3]\.[0-9])["]) (?P<status_code>\d{3}) (?P<bytes_sent>\d{1,99})(["](?P<url>(\-)|(.+))["]) (?P<host>.+) (["](?P<user_agent>.+)["])(["](?P<request_time>.+)["]) (["](?P<connect_time>.+)["])(["](?P<city>.+)["]) (["](?P<country_code>.+)["])', IGNORECASE) # NOQA
                 if regex.match(line):
-                    logging.debug('Regex is matching %s continuing...' % log_path)
+                    logging.debug(f'Regex is matching {log_path} continuing...')
                     return True
             if re_ipv6.match(line):
                 regex = compile(r'(?P<ipaddress>(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))) - (?P<remote_user>.+) \[(?P<dateandtime>\d{2}\/[A-Z]{1}[a-z]{2}\/\d{4}:\d{2}:\d{2}:\d{2} ((\+|\-)\d{4}))\](["](?P<method>.+)) (?P<referrer>.+) ((?P<http_version>HTTP\/[1-3]\.[0-9])["]) (?P<status_code>\d{3}) (?P<bytes_sent>\d{1,99})(["](?P<url>(\-)|(.+))["]) (?P<host>.+) (["](?P<user_agent>.+)["])(["](?P<request_time>.+)["]) (["](?P<connect_time>.+)["])(["](?P<city>.+)["]) (["](?P<country_code>.+)["])', IGNORECASE) # NOQA
                 if regex.match(line):
-                    logging.debug('Regex is matching %s continuing...' % log_path)
+                    logging.debug(f'Regex is matching {log_path} continuing...')
                     return True
             else:
-                logging.debug('Testing regex on: %s ' % log_path)
+                logging.debug(f'Testing regex on: {log_path}')
                 sleep(2)
         if time() > time_out:
-            logging.warning('Failed to match regex on:  %s ' % log_path)
+            logging.warning(f'Failed to match regex on: {log_path}')
             break
 
 
@@ -93,24 +78,24 @@ def file_exists(log_path,geoip_db_path):
     while True:
         file_list = [log_path, geoip_db_path]
         if not exists(log_path):
-            logging.warning(('File: %s not found...' % log_path))
+            logging.warning((f'File: {log_path} not found...'))
             sleep(1)
         if not exists(geoip_db_path):
-            logging.warning(('File: %s not found...' % geoip_db_path))
+            logging.warning((f'File: {geoip_db_path} not found...'))
             sleep(1)
         if all([isfile(f) for f in file_list]):
             for f in file_list:
-                logging.debug('Found: %s' % f)
+                logging.debug(f'Found: {f}')
             return True
         if time() > time_out:
             if not exists(geoip_db_path) and not exists(log_path):
-                logging.critical("Can't find: " + geoip_db_path + ' or ' + log_path + ', exiting!')
+                logging.critical(f"Can't find: {geoip_db_path} or {log_path} exiting!")
                 break
             elif not exists(geoip_db_path):
-                logging.critical("Can't find: %s , exiting!" % geoip_db_path)
+                logging.critical(f"Can't find: {geoip_db_path}, exiting!")
                 break
             elif not exists(log_path):
-                logging.critical("Can't find: %s , exiting!" % log_path)
+                logging.critical(f"Can't find: {log_path}, exiting!")
                 break
 
 
@@ -131,31 +116,31 @@ def logparse(
     try:
         logging.debug('Testing InfluxDB connection')
         version = client.request('ping', expected_response_code=204).headers['X-Influxdb-Version']
-        logging.debug('Influxdb version: %s' % version)
+        logging.debug(f'Influxdb version: {version}')
     except ConnectionError as e:
         logging.critical('Error testing connection to InfluxDB. Please check your url/hostname.\n'
-                         'Error: %s' % e
+                         f'Error: {e}'
                         )
         exit(1)
 
     try:
         databases = [db['name'] for db in client.get_list_database()]
         if influxdb_database in databases:    
-            logging.debug('Found database: %s' % influxdb_database)
+            logging.debug(f'Found database: {influxdb_database}')
     except InfluxDBClientError as e:
         logging.critical('Error getting database list! Please check your InfluxDB configuration.\n'
-                         'Error: %s' % e
+                         f'Error: {e}'
                         )
         exit(1)
 
     if influxdb_database not in databases:
-        logging.info('Creating database: %s' % influxdb_database)
+        logging.info(f'Creating database: {influxdb_database}')
         client.create_database(influxdb_database)
 
         retention_policies = [policy['name'] for policy in client.get_list_retention_policies(database=influxdb_database)]
-        if '%s %s-%s' % (influxdb_database, influxdb_retention, influxdb_shard) not in retention_policies:
-            logging.info('Creating %s retention policy (%s-%s)' % (influxdb_database, influxdb_retention, influxdb_shard))
-            client.create_retention_policy(name='%s %s-%s' % (influxdb_database, influxdb_retention, influxdb_shard), duration=influxdb_retention, replication='1',
+        if f'{influxdb_database} {influxdb_retention}-{influxdb_shard}' not in retention_policies:
+            logging.info(f'Creating {influxdb_database} retention policy ({influxdb_retention}-{influxdb_shard})')
+            client.create_retention_policy(name=f'{influxdb_database} {influxdb_retention}-{influxdb_shard}', duration=influxdb_retention, replication='1',
                                                 database=influxdb_database, default=True, shard_duration=influxdb_shard)
 
     re_ipv4 = compile(r'(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - (?P<remote_user>.+) \[(?P<dateandtime>\d{2}\/[A-Z]{1}[a-z]{2}\/\d{4}:\d{2}:\d{2}:\d{2} ((\+|\-)\d{4}))\](["](?P<method>.+)) (?P<referrer>.+) ((?P<http_version>HTTP\/[1-3]\.[0-9])["]) (?P<status_code>\d{3}) (?P<bytes_sent>\d{1,99})(["](?P<url>(\-)|(.+))["]) (?P<host>.+) (["](?P<user_agent>.+)["])(["](?P<request_time>.+)["]) (["](?P<connect_time>.+)["])(["](?P<city>.+)["]) (["](?P<country_code>.+)["])', IGNORECASE) # NOQA
@@ -207,7 +192,7 @@ def logparse(
                 else:
                     logging.warning('Failed to match regex that previously matched!? Skipping this line!\n'
                                     'Please share the log line below on Discord or Github!\n' 
-                                    'Line: %s' % line
+                                    f'Line: {line}'
                                    )
                     continue
                 if ipadd(ip).iptype() == 'PUBLIC' and ip:
@@ -230,12 +215,12 @@ def logparse(
                         ips['fields'] = geohash_fields
                         ips['measurement'] = geo_measurement
                         geo_metrics.append(ips)
-                        logging.debug('Geo metrics: %s' % geo_metrics)
+                        logging.debug(f'Geo metrics: {geo_metrics}')
                         try:
                             client.write_points(geo_metrics)
                         except (InfluxDBServerError, ConnectionError) as e:
                             logging.error('Error writing data to InfluxDB! Check your database!\n'
-                                          'Error: %s' % e
+                                          f'Error: {e}'
                                          )
 
                 if send_logs:
@@ -271,12 +256,12 @@ def logparse(
                             nginx_log['fields'] = log_data_fields
                             nginx_log['measurement'] = log_measurement
                             log_metrics.append(nginx_log)
-                            logging.debug('NGINX log metrics: %s' % log_metrics)
+                            logging.debug(f'NGINX log metrics: {log_metrics}')
                             try:
                                 client.write_points(log_metrics)
                             except (InfluxDBServerError, InfluxDBClientError, ConnectionError) as e:
                                 logging.error('Error writing data to InfluxDB! Check your database!\n'
-                                            'Error: %s' % e
+                                            f'Error: {e}'
                                             )
 
 
@@ -284,19 +269,19 @@ def main():
     logging.info('Starting geoip2influx..')
 
     logging.debug('Variables set:' +
-    '\n geoip_db_path             :: %s' % geoip_db_path +
-    '\n -e LOG_PATH               :: %s' % log_path +
-    '\n -e INFLUX_HOST            :: %s' % influxdb_host +
-    '\n -e INFLUX_HOST_PORT       :: %s' % influxdb_port +
-    '\n -e INFLUX_DATABASE        :: %s' % influxdb_database +
-    '\n -e INFLUX_RETENTION       :: %s' % influxdb_retention +
-    '\n -e INFLUX_SHARD           :: %s' % influxdb_shard +
-    '\n -e INFLUX_USER            :: %s' % influxdb_user +
-    '\n -e INFLUX_PASS            :: %s' % influxdb_user_pass +
-    '\n -e GEO_MEASUREMENT        :: %s' % geo_measurement +
-    '\n -e LOG_MEASUREMENT        :: %s' % log_measurement +
-    '\n -e SEND_NGINX_LOGS        :: %s' % send_nginx_logs +
-    '\n -e GEOIP2INFLUX_LOG_LEVEL :: %s' % log_level
+    f'\n geoip_db_path             :: {geoip_db_path}' +
+    f'\n -e LOG_PATH               :: {log_path}' +
+    f'\n -e INFLUX_HOST            :: {influxdb_host}' +
+    f'\n -e INFLUX_HOST_PORT       :: {influxdb_port}' +
+    f'\n -e INFLUX_DATABASE        :: {influxdb_database}' +
+    f'\n -e INFLUX_RETENTION       :: {influxdb_retention}' +
+    f'\n -e INFLUX_SHARD           :: {influxdb_shard}' +
+    f'\n -e INFLUX_USER            :: {influxdb_user}' +
+    f'\n -e INFLUX_PASS            :: {influxdb_user_pass}' +
+    f'\n -e GEO_MEASUREMENT        :: {geo_measurement}' +
+    f'\n -e LOG_MEASUREMENT        :: {log_measurement}' +
+    f'\n -e SEND_NGINX_LOGS        :: {send_nginx_logs}' +
+    f'\n -e GEOIP2INFLUX_LOG_LEVEL :: {log_level}' 
     )
     # Parsing log file and sending metrics to Influxdb
     while file_exists(log_path,geoip_db_path):

@@ -13,11 +13,16 @@ GEO_MEASUREMENT=${GEO_MEASUREMENT}\\n\
 LOG_MEASUREMENT=${LOG_MEASUREMENT}\\n\
 SEND_NGINX_LOGS=${SEND_NGINX_LOGS}\\n\
 GEOIP2INFLUX_LOG_LEVEL=${GEOIP2INFLUX_LOG_LEVEL}\\n\
+GEOIP2INFLUX_LOG_PATH=${GEOIP2INFLUX_LOG_PATH}\\n\
 MAXMINDDB_LICENSE_KEY=${MAXMINDDB_LICENSE_KEY}\\n"
 
-mkdir -p /config/geoip2db
+mkdir -p \
+  /config/geoip2db \
+  /config/log/geoip2influx
 cp -f /geoip2influx/geoip2influx.py /config/geoip2db
-
+# move old log if needed
+if [ -f /config/geoip2db/geoip2influx.log ]; then
+  mv /config/geoip2db/geoip2influx.log /config/log/geoip2influx
 # create GeoIP2 folder symlink
 [[ -d /var/lib/libmaxminddb ]] && [[ ! -L /var/lib/libmaxminddb ]] && \
   rm -rf /var/lib/libmaxminddb

@@ -34,7 +34,7 @@ log_level = env.get('GEOIP2INFLUX_LOG_LEVEL', 'info').upper()
 g2i_log_path = env.get('GEOIP2INFLUX_LOG_PATH','/config/log/geoip2influx/geoip2influx.log')
 
 # Logging
-logging.basicConfig(level=log_level,format='%(asctime)s :: %(levelname)s :: %(message)s',datefmt='%d/%b/%Y %H:%M:%S',filename=g2i_log_path)
+logging.basicConfig(level=log_level,format='GEOIP2INFLUX %(asctime)s :: %(levelname)s :: %(message)s',datefmt='%d/%b/%Y %H:%M:%S',handlers=[logging.StreamHandler(),logging.FileHandler(g2i_log_path)])
 
 def regex_tester(log_path, N):
     time_out = time() + 60

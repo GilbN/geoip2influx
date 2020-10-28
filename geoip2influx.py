@@ -192,7 +192,7 @@ def logparse(
                     log = re_ipv6
                 else:
                     logging.warning('Failed to match regex that previously matched!? Skipping this line!\n'
-                                    'Please share the log line below on Discord or Github!\n' 
+                                    'If you think the regex should have mathed the line, please share the log line below on https://discord.gg/HSPa4cz or Github: https://github.com/gilbN/geoip2influx\n' 
                                     f'Line: {line}'
                                    )
                     continue

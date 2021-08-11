@@ -3,6 +3,10 @@ on:
   push:
     branches: 
       - master
+    paths:
+      - 'geoip2influx.py'
+      - 'requirements.txt'
+      - 'root/**'
 jobs:
   push_to_ghcr_io:
     runs-on: ubuntu-latest

@@ -71,7 +71,7 @@ docker create \
   -v /path/to/appdata/geoip2influx:/config \
   -v /path/to/nginx/accesslog/:/config/log/nginx/ \
   --restart unless-stopped \
-  gilbn/geoip2influx
+  ghcr.io/gilbn/geoip2influx
 ```
 
 ### Docker compose
@@ -80,7 +80,7 @@ docker create \
 version: "2.1"
 services:
   geoip2influx:
-    image: gilbn/geoip2influx
+    image: ghcr.io/gilbn/geoip2influx
     container_name: geoip2influx
     environment:
       - PUID=1000

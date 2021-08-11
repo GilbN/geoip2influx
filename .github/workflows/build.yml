@@ -6,6 +6,7 @@ on:
     paths:
       - 'geoip2influx.py'
       - 'requirements.txt'
+      - 'Dockerfile'
       - 'root/**'
 jobs:
   push_to_ghcr_io:

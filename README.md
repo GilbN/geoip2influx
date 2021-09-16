@@ -100,6 +100,7 @@ services:
 ## Grafana dashboard: 
 ### [Grafana Dashboard Link](https://grafana.com/grafana/dashboards/12268/)
 
+Needs the [grafana-worldmap-panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel/?tab=installation)
 ***
 
 ## Sending Nginx log metrics

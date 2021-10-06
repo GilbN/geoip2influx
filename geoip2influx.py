@@ -36,6 +36,10 @@ g2i_log_path = env.get('GEOIP2INFLUX_LOG_PATH','/config/log/geoip2influx/geoip2i
 # Logging
 logging.basicConfig(level=log_level,format='GEOIP2INFLUX %(asctime)s :: %(levelname)s :: %(message)s',datefmt='%d/%b/%Y %H:%M:%S',handlers=[logging.StreamHandler(),logging.FileHandler(g2i_log_path)])
 
+# global variables
+monitored_ip_types = ['PUBLIC', 'ALLOCATED APNIC', 'ALLOCATED ARIN', 'ALLOCATED RIPE NCC', 'ALLOCATED LACNIC', 'ALLOCATED AFRINIC']
+
+
 def regex_tester(log_path, N):
     time_out = time() + 60
     re_ipv4 = compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
@@ -196,7 +200,7 @@ def logparse(
                                     f'Line: {line}'
                                    )
                     continue
-                if ipadd(ip).iptype() == 'PUBLIC' and ip:
+                if ipadd(ip).iptype() in monitored_ip_types and ip:
                     info = gi.city(ip)
                     if info is not None:
                         geohash = encode(info.location.latitude, info.location.longitude)
@@ -226,7 +230,7 @@ def logparse(
 
                 if send_logs:
                     data = search(log, line)
-                    if ipadd(ip).iptype() == 'PUBLIC' and ip:
+                    if ipadd(ip).iptype() in monitored_ip_types and ip:
                         info = gi.city(ip)
                         if info is not None:
                             datadict = data.groupdict()

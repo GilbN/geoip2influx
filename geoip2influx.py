@@ -200,7 +200,8 @@ def logparse(
                                     f'Line: {line}'
                                    )
                     continue
-                if ipadd(ip).iptype() in monitored_ip_types and ip:
+                ip_type = ipadd(ip).iptype()
+                if ip_type in monitored_ip_types and ip:
                     info = gi.city(ip)
                     if info is not None:
                         geohash = encode(info.location.latitude, info.location.longitude)
@@ -227,10 +228,11 @@ def logparse(
                             logging.error('Error writing data to InfluxDB! Check your database!\n'
                                           f'Error: {e}'
                                          )
-
+                else:
+                    logging.debug(f"Incorrect IP type: {ip_type}")
                 if send_logs:
                     data = search(log, line)
-                    if ipadd(ip).iptype() in monitored_ip_types and ip:
+                    if ip_type in monitored_ip_types and ip:
                         info = gi.city(ip)
                         if info is not None:
                             datadict = data.groupdict()

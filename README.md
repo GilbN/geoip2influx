@@ -39,6 +39,7 @@ Add the ones that differ on your system.
 | INFLUX_RETENTION | 7d | Sets the retention for the database. Optional, defaults to example.|
 | INFLUX_SHARD | 1d | Set the shard for the database. Optional, defaults to example. |
 | MAXMINDDB_LICENSE_KEY | xxxxxxx | Add your Maxmind licence key |
+| MAXMINDDB_USER_ID | xxxxxxx| Add your Maxmind account id |
 
 
 ### MaxMind Geolite2
@@ -68,6 +69,7 @@ docker create \
   -e INFLUX_HOST=<influxdb host> \
   -e INFLUX_HOST_PORT=<influxdb port> \
   -e MAXMINDDB_LICENSE_KEY=<license key>\
+  -e MAXMINDDB_USER_ID=<account id>\
   -v /path/to/appdata/geoip2influx:/config \
   -v /path/to/nginx/accesslog/:/config/log/nginx/ \
   --restart unless-stopped \
@@ -89,6 +91,7 @@ services:
       - INFLUX_HOST=<influxdb host>
       - INFLUX_HOST_PORT=<influxdb port>
       - MAXMINDDB_LICENSE_KEY=<license key>
+      - MAXMINDDB_USER_ID=<account id>
     volumes:
       - /path/to/appdata/geoip2influx:/config
       - /path/to/nginx/accesslog/:/config/log/nginx/
@@ -147,6 +150,8 @@ Then use the `/config/log/nginx/access.log` file in the `NGINX_LOG_PATH` variabl
 ***
 
 ## Updates 
+
+**xx.xx.24** - Refactor to alpine 3.20. New env required. MAXMINDDB_USER_ID. 
 
 **21.06.20** - Added $host(domain) to the nginx log metrics. This will break your nginx logs parsing, as you need to update the custom log format.
 

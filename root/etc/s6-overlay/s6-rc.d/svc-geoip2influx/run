@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 
   exec \
         python3 /config/geoip2db/geoip2influx.py

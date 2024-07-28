@@ -8,7 +8,7 @@
         missingok
         notifempty
         postrotate
-                s6-svc -1 /run/service/svc-geoip2influx
+                s6-svc -r /var/run/s6/services/geoip2influx
         endscript
         su abc abc
 }

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from geoip2influx.logger import configure_logging
 import os
 import logging
 
-from geoip2influx.logparser import LogParser
-
 from dotenv import load_dotenv
 load_dotenv()
+
+from geoip2influx.logger import configure_logging
+from geoip2influx.logparser import LogParser
 
 if __name__ == "__main__":
     try:
@@ -18,6 +18,7 @@ if __name__ == "__main__":
         parser.run()
     except KeyboardInterrupt:
         logger.info("Exiting GeoIP2Influx.")
+        logger.info("Parsed %d log lines.", parser.parsed_lines)
         exit(0)
     except Exception:
         logger.exception("Error running parser.")

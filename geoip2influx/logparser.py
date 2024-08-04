@@ -51,6 +51,7 @@ class LogParser:
         self.client = InfluxClient()
         self.geoip_reader = geoip2.database.Reader(self.geoip_path)
         self.current_log_inode: int|None = None
+        self.parsed_lines: int = 0
         
         self.logger = logging.getLogger("LogParser")
         self.logger.debug("Log file path: %s", self.log_path)
@@ -114,7 +115,7 @@ class LogParser:
         self.logger.info(f"GeoIP file {self.geoip_path} exists.")
         return True
     
-    def tail_logs(self) -> None:
+    def tail_logs(self, skip_validation: bool = False) -> None:
         """Continiously tail the log file and parse the logs.
         
         If the log file has been rotated, reopen the file and continue tailing.
@@ -122,21 +123,21 @@ class LogParser:
         Writes the geo data to InfluxDB and optionally the log data.
         """
         
-        self.logger.debug("Trying to validate the log file format.")
-        if not self.validate_log_format():
-            self.send_logs = False
-            self.logger.warning("Log file format is invalid. Only sending geo data to Influx.")
+        if not skip_validation:
+            self.logger.debug("Trying to validate the log file format.")
+            if not self.validate_log_format():
+                self.send_logs = False
+                self.logger.warning("Log file format is invalid. Only sending geo data to Influx.")
 
         self.logger.debug("Opening log file.")
         with open(self.log_path, "r", encoding="utf-8") as file:
-            str_results: os.stat_result = os.stat(self.log_path)
-            st_size: int = str_results.st_size
+            stat_results: os.stat_result = os.stat(self.log_path)
+            st_size: int = stat_results.st_size
             file.seek(st_size) # Move to the end of the file
             self.logger.info("Tailing log file.")
             while True:
-                if self.inode_changed():
-                    self.logger.info("Log file has been rotated.")
-                    return self.tail_logs() # Reopen the file and continue tailing
+                if self.is_rotated(stat_results):
+                    return self.tail_logs(skip_validation=True) # Reopen the file and continue tailing
                 where = file.tell() # Get the current position in the file
                 line = file.readline() # Read the next line
                 if not line: # If the line is empty, wait for 1 second
@@ -156,23 +157,27 @@ class LogParser:
                 if self.send_logs:
                     log_metrics: list[dict] = self.create_log_metrics(matched, ip)
                     self.client.write_to_influx(log_metrics)
-                    
+                self.parsed_lines += 1
+
     def run(self) -> None:
         """Tail the log file and write the data to InfluxDB."""
         while all([self.log_file_exists(), self.geoip_file_exists()]):
             self.tail_logs()
     
-    def inode_changed(self) -> bool:
-        """Check if the inode of the log file has changed.
-        
-        This is used to check if the log file has been rotated.
+    def is_rotated(self, stat_result:os.stat_result) -> bool:
+        """Check if log file has been rotated/truncated.
         
         Update the current inode if it has changed.
         """
-        inode = os.stat(self.log_path).st_ino
-        if inode != self.current_log_inode:
-            self.logger.debug("Log file inode %s has changed. New inode is %s.", self.current_log_inode, inode)
-            self.current_log_inode = inode
+        new_stat_results: os.stat_result = os.stat(self.log_path)
+        new_st_size: int = new_stat_results.st_size
+        new_inode = new_stat_results.st_ino
+        if stat_result.st_size > new_st_size:
+            self.logger.info("Log file has been truncated/rotated.")
+            return True
+        if new_inode != self.current_log_inode:
+            self.logger.info("Log file inode %s has changed. New inode is %s.", self.current_log_inode, new_inode)
+            self.current_log_inode = new_inode
             return True
         return False
     

@@ -94,20 +94,17 @@ def configure_logging(log_level:str) -> None:
 
     # Console logging
     ch = logging.StreamHandler()
-    cf = CustomLogFormatter('%(asctime)-15s | %(threadName)-17s | %(name)-10s | %(levelname)-8s | (%(module)s.%(funcName)s|line:%(lineno)d) | %(message)s |', '%d/%m/%Y %H:%M:%S')
+    cf = CustomLogFormatter('%(asctime)-15s | %(threadName)-17s | %(name)-12s | %(levelname)-8s | (%(module)s.%(funcName)s|line:%(lineno)d) | %(message)s |', '%d/%m/%Y %H:%M:%S')
     ch.setFormatter(cf)
     ch.setLevel(log_level)
     logger.addHandler(ch)
 
     # File logging
     fh = TimedRotatingFileHandler(log_dir, when="midnight", interval=1, backupCount=7, delay=True, encoding='utf-8')
-    f = logging.Formatter('%(asctime)-15s | %(threadName)-17s | %(name)-10s | %(levelname)-8s | (%(module)s.%(funcName)s|line:%(lineno)d) | %(message)s |', '%d/%m/%Y %H:%M:%S')
+    f = logging.Formatter('%(asctime)-15s | %(threadName)-17s | %(name)-12s | %(levelname)-8s | (%(module)s.%(funcName)s|line:%(lineno)d) | %(message)s |', '%d/%m/%Y %H:%M:%S')
     fh.setFormatter(f)
     fh.setLevel(log_level)
     logger.addHandler(fh)
 
     logging.info('Operating system: %s', platform.platform())
     logging.info('Python version: %s', platform.python_version())
-    if log_level.upper() == "DEBUG":
-        logging.getLogger("botocore").setLevel(logging.WARNING) # Mute boto3 logging output
-        logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING) # Mute urllib3.connectionpool logging output

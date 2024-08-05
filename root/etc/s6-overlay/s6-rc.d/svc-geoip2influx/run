@@ -2,4 +2,4 @@
 # shellcheck shell=bash
 
   exec \
-        python3 /config/geoip2db/geoip2influx.py
+        python3 /config/geoip2db/run.py

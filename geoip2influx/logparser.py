@@ -41,8 +41,8 @@ def wait(timeout_seconds=60):
 
 class LogParser:
     def __init__(self) -> None:
-        self.log_path: str = os.getenv("NGINX_LOG_PATH", "/var/log/nginx/access.log")
-        self.geoip_path: str = os.getenv("GEOIP_DB_PATH", "/usr/share/GeoIP/GeoLite2-City.mmdb")
+        self.log_path: str = os.getenv("NGINX_LOG_PATH", "/config/log/nginx/access.log")
+        self.geoip_path: str = os.getenv("GEOIP_DB_PATH", "/config/geoip2db/GeoLite2-City.mmdb")
         self.geo_measurement = os.getenv("GEO_MEASUREMENT", "geoip2influx")
         self.log_measurement = os.getenv("LOG_MEASUREMENT", "nginx_access_logs")
         self.send_logs: bool = os.getenv("SEND_NGINX_LOGS", "true").lower() == "true"

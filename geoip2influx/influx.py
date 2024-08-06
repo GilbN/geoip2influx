@@ -46,7 +46,6 @@ class InfluxClient:
         self.retention_policy = f"{self.database} {self.retention}-{self.shard}"
         
         self.logger = logging.getLogger("InfluxClient")
-        
         self.logger.debug("InfluxDB host: %s", self.host)
         self.logger.debug("InfluxDB port: %s", self.port)
         self.logger.debug("InfluxDB username: %s", self.username)
@@ -70,7 +69,7 @@ class InfluxClient:
         self.create_database()
         self.create_retention_policy()
         self.validate()
-        self.logger.info("InfluxDB client setup complete.")
+        self.logger.success("InfluxDB client setup complete.")
         
     def create_influx_client(self, **kwargs) -> InfluxDBClient | None:
         try:

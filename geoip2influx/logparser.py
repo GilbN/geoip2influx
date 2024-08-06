@@ -89,7 +89,7 @@ class LogParser:
         lines: list = log_lines_capture[-LAST_LINE_COUNT:] # Get the last 3 lines
         for line in lines:
             if self.validate_log_line(line):
-                self.logger.info("Log file format is valid.")
+                self.logger.success("Log file format is valid!")
                 return True
         self.logger.debug("Testing log format")
         return False

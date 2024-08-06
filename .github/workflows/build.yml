@@ -4,7 +4,9 @@ on:
     branches: 
       - master
     paths:
-      - 'geoip2influx.py'
+      - 'geoip2influx/**'
+      - 'tests/**'
+      - 'run.py'
       - 'requirements.txt'
       - 'Dockerfile'
       - 'root/**'

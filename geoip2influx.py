@@ -301,6 +301,7 @@ def main():
 
 if __name__ == '__main__':
     try:
+        logging.warning("THIS SCRIPT IS DEPRECATED! Please use the new run.py script and its dependencies instead!")
         main()
     except KeyboardInterrupt:
         exit(0)

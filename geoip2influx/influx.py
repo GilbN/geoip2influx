@@ -11,8 +11,8 @@ from influxdb.exceptions import InfluxDBServerError, InfluxDBClientError
 logger: Logger = logging.getLogger(__name__)
 
 class InfluxClient:
-    def __init__(self, **kwargs) -> None:
-        """Initialize the InfluxDB client.
+    def __init__(self, auto_init: bool = True, **kwargs) -> None:
+        """Initialize the InfluxDBClient.
         
         If no arguments are provided, the client will attempt to use the following environment variables:
         - INFLUX_HOST
@@ -61,7 +61,8 @@ class InfluxClient:
             **kwargs
         )
         
-        self.setup() # Setup the database and retention policy
+        if auto_init:
+            self.setup()
 
     def setup(self):
         """Setup the database and retention policy, and validate the setup."""

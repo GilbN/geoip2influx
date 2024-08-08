@@ -8,10 +8,9 @@ from functools import wraps
 import socket
 from datetime import datetime
 
-import geoip2
-from geohash2 import encode
-import geoip2.database
+from geoip2.database import Reader
 from geoip2.models import City
+from geohash2 import encode
 
 from IPy import IP
 
@@ -40,7 +39,12 @@ def wait(timeout_seconds=60):
     return decorator
 
 class LogParser:
-    def __init__(self) -> None:
+    def __init__(self, auto_init: bool = True) -> None:
+        """Initialize the LogParser.
+
+        Args:
+            auto_init (bool, optional): Will run the setup method if True. Defaults to True.
+        """
         self.log_path: str = os.getenv("NGINX_LOG_PATH", "/config/log/nginx/access.log")
         self.geoip_path: str = os.getenv("GEOIP_DB_PATH", "/config/geoip2db/GeoLite2-City.mmdb")
         self.geo_measurement = os.getenv("GEO_MEASUREMENT", "geoip2influx")
@@ -48,8 +52,8 @@ class LogParser:
         self.send_logs: bool = os.getenv("SEND_NGINX_LOGS", "true").lower() == "true"
        
         self.hostname: str = socket.gethostname()
-        self.client = InfluxClient()
-        self.geoip_reader = geoip2.database.Reader(self.geoip_path)
+        self.client = InfluxClient(auto_init)
+        self.geoip_reader: None|Reader = None
         self.current_log_inode: int|None = None
         self.parsed_lines: int = 0
         
@@ -60,6 +64,14 @@ class LogParser:
         self.logger.debug("NGINX log measurement name: %s", self.log_measurement)
         self.logger.debug("Send NGINX logs: %s", self.send_logs)
         self.logger.debug("Hostname: %s", self.hostname)
+
+        if auto_init:
+            self.setup()
+
+    def setup(self) -> None:
+        """Setup the necessary components before running the log parser."""
+        self.geoip_reader = Reader(self.geoip_path)
+        self.client.setup()
     
     def validate_log_line(self, log_line: str) -> re.Match[str] | None:
         """Validate the log line against the IPv4 and IPv6 patterns."""
@@ -182,7 +194,10 @@ class LogParser:
         return False
     
     def get_ip_type(self, ip:str) -> str:
-        """Get the IP type of the given IP address."""
+        """Get the IP type of the given IP address.
+        
+        If the IP address is invalid, return an empty string.
+        """
         if not isinstance(ip, str):
             self.logger.error("IP address must be a string.")
             return ""
@@ -192,6 +207,14 @@ class LogParser:
         except ValueError:
             self.logger.error("Invalid IP address %s.", ip)
             return ""
+    
+    def check_ip_type(self, ip:str) -> bool:
+        """Check that the ip type is one of the monitored IP types."""
+        ip_type: str = self.get_ip_type(ip)
+        if ip_type not in MONITORED_IP_TYPES:
+            self.logger.debug("IP type %s (%s) is not a monitored IP type.", ip_type, ip)
+            return False
+        return True
     
     def create_geo_metrics(self, ip:str) -> list[dict]:
         """Create the geo metrics for the given IP address.
@@ -210,14 +233,14 @@ class LogParser:
         geohash_fields: dict = {}
         geohash_tags: dict = {}
         
-        if self.get_ip_type(ip) not in MONITORED_IP_TYPES:
-            self.logger.debug("IP %s is not a monitored IP type.", ip)
+        if not self.check_ip_type(ip):
             return []
         
         ip_data: City = self.geoip_reader.city(ip)
         if not ip_data:
             self.logger.debug("No data found for IP %s.", ip)
             return []
+        
         geohash = encode(ip_data.location.latitude, ip_data.location.longitude)
         geohash_fields["count"] = 1
         geohash_tags["geohash"] = geohash
@@ -257,9 +280,9 @@ class LogParser:
             self.logger.error("Log data must be a valid log data.")
             return []
         
-        if self.get_ip_type(ip) not in MONITORED_IP_TYPES:
-            self.logger.debug("IP %s is not a monitored IP type.", ip)
+        if not self.check_ip_type(ip):
             return []
+
         ip_data: City = self.geoip_reader.city(ip)
         if not ip_data:
             self.logger.debug("No data found for IP %s.", ip)

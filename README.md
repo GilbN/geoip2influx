@@ -12,7 +12,7 @@ A python script that will parse the nginx access.log and send geolocation metric
 
 ![](https://i.imgur.com/mh0IhYA.jpg)
 
-### For the linuxserver/letsencrypt docker mod, click here : https://github.com/gilbN/lsio-docker-mods/tree/master/letsencrypt/geoip2-nginx-stats
+### For the linuxserver/letsencrypt docker mod, click here : https://github.com/linuxserver/docker-mods/tree/swag-geoip2influx
 
 ***
 
@@ -36,6 +36,7 @@ Add the ones that differ on your system.
 | SEND_NGINX_LOGS | true | Set to `false` to disable nginx logs. Optional, defaults to `true`. |
 | GEOIP2INFLUX_LOG_LEVEL | info | Sets the log level in geoip2influx.log. Use `debug` for verbose logging Optional, defaults to info. |
 | GEOIP2INFLUX_LOG_PATH | /config/log/geoip2influx/geoip2influx.log | Optional. Defaults to example. |
+| GEOIP_DB_PATH | /config/geoip2db/GeoLite2-City.mmdb | Optional. Defaults to example. |
 | INFLUX_RETENTION | 7d | Sets the retention for the database. Optional, defaults to example.|
 | INFLUX_SHARD | 1d | Set the shard for the database. Optional, defaults to example. |
 | MAXMINDDB_LICENSE_KEY | xxxxxxx | Add your Maxmind licence key |
@@ -151,7 +152,9 @@ Then use the `/config/log/nginx/access.log` file in the `NGINX_LOG_PATH` variabl
 
 ## Updates 
 
-**xx.xx.24** - Refactor to alpine 3.20. New env required. MAXMINDDB_USER_ID. 
+**06.08.24** - Complete refactor of the python code. Deprecate the old geoip2influx.py file.
+
+**28.07.24** - Refactor to alpine 3.20. New env required. MAXMINDDB_USER_ID. 
 
 **21.06.20** - Added $host(domain) to the nginx log metrics. This will break your nginx logs parsing, as you need to update the custom log format.
 

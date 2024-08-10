@@ -42,6 +42,16 @@ Add the ones that differ on your system.
 | MAXMINDDB_LICENSE_KEY | xxxxxxx | Add your Maxmind licence key |
 | MAXMINDDB_USER_ID | xxxxxxx| Add your Maxmind account id |
 
+**InfluxDB v2.x values**
+
+| Environment Variable | Example Value | Description |
+| -------------------- | ------------- | ----------- |
+| INFLUXDB_V2_TOKEN | secret-token | Required |
+| INFLUXDB_V2_URL | http://localhost:8086 | Optional, defaults to http://localhost:8086 |
+| INFLUXDB_V2_ORG | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
+| INFLUXDB_V2_BUCKET | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
+| INFLUXDB_V2_RETENTION | 604800 | Optional, defaults to 604800. 7 days in seconds |
+| INFLUXDB_V2_DEBUG | false | Optional, defaults to false | 
 
 ### MaxMind Geolite2
 
@@ -51,12 +61,12 @@ Get your licence key here: https://www.maxmind.com/en/geolite2/signup
 
 ### InfluxDB 
 
-#### InfluxDB v2.x is not supported. Use v1.8x. 
+#### InfluxDB v2.x and v1.8x is supported.
 
-The InfluxDB database will be created automatically with the name you choose.
+The InfluxDB database/bucket will be created automatically with the name you choose.
 
 ```
--e INFLUX_DATABASE=geoip2influx 
+-e INFLUX_DATABASE=geoip2influx or -e INFLUXDB_V2_BUCKET=geoip2influx
 ```
 
 ### Docker

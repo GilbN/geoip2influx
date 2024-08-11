@@ -116,12 +116,56 @@ services:
     restart: unless-stopped
 ```
 
+**InfluxDB2 examples**
+
+```bash
+docker create \
+  --name=geoip2influx \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Europe/Oslo \
+  -e INFLUXDB_V2_URL=<influxdb url> \
+  -e INFLUXDB_V2_TOKEN=<influxdb token> \
+  -e USE_INFLUX_V2=true \
+  -e MAXMINDDB_LICENSE_KEY=<license key>\
+  -e MAXMINDDB_USER_ID=<account id>\
+  -v /path/to/appdata/geoip2influx:/config \
+  -v /path/to/nginx/accesslog/:/config/log/nginx/ \
+  --restart unless-stopped \
+  ghcr.io/gilbn/geoip2influx
+```
+
+```yaml
+version: "2.1"
+services:
+  geoip2influx:
+    image: ghcr.io/gilbn/geoip2influx
+    container_name: geoip2influx
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Oslo
+      - INFLUXDB_V2_URL=<influxdb url>
+      - INFLUXDB_V2_TOKEN=<influxdb token>
+      - USE_INFLUX_V2=true
+      - MAXMINDDB_LICENSE_KEY=<license key>
+      - MAXMINDDB_USER_ID=<account id>
+    volumes:
+      - /path/to/appdata/geoip2influx:/config
+      - /path/to/nginx/accesslog/:/config/log/nginx/
+    restart: unless-stopped
+```
+
 ***
 
 ## Grafana dashboard: 
-### [Grafana Dashboard Link](https://grafana.com/grafana/dashboards/12268/)
 
-Needs the [grafana-worldmap-panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel/?tab=installation)
+Use [nginx_logs_geo_map.json](/nginx_logs_geo_map.json)
+
+### Note
+
+Currently only supports InfluxDB 1.8.x.
+
 ***
 
 ## Sending Nginx log metrics

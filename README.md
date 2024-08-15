@@ -51,12 +51,16 @@ Add the ones that differ on your system.
 
 | Environment Variable | Example Value | Description |
 | -------------------- | ------------- | ----------- |
+| USE_INFLUX_V2 | true | Required if using InfluxDB2. Defaults to false |
 | INFLUXDB_V2_TOKEN | secret-token | Required |
 | INFLUXDB_V2_URL | http://localhost:8086 | Optional, defaults to http://localhost:8086 |
 | INFLUXDB_V2_ORG | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
 | INFLUXDB_V2_BUCKET | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
 | INFLUXDB_V2_RETENTION | 604800 | Optional, defaults to 604800. 7 days in seconds |
-| INFLUXDB_V2_DEBUG | false | Optional, defaults to false | 
+| INFLUXDB_V2_DEBUG | false | Optional, defaults to false. Enables the debug mode for the influxdb-client package. |
+| INFLUXDB_V2_BATCHING | true | Optional, defaults to false. Enables batch writing of data. |
+| INFLUXDB_V2_BATCH_SIZE | 100 | Optional, defaults to 10. |
+| INFLUXDB_V2_FLUSH_INTERVAL | 30000 | Optional, defaults to 15000. How often in milliseconds to write a batch |
 
 ### MaxMind Geolite2
 
@@ -70,7 +74,7 @@ Get your licence key here: https://www.maxmind.com/en/geolite2/signup
 
 #### Note: The Grafana dashboard currently only supports InfluxDB v1.8.x
 
-The InfluxDB database/bucket will be created automatically with the name you choose.
+The InfluxDB database/bucket and retention rules will be created automatically with the name you choose.
 
 ```
 -e INFLUX_DATABASE=geoip2influx or -e INFLUXDB_V2_BUCKET=geoip2influx

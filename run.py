@@ -11,6 +11,10 @@ load_dotenv()
 def handle_sigterm(signum, frame):
     logger = logging.getLogger("g2i")
     logger.info("Received SIGTERM. Exiting GeoIP2Influx.")
+    try:
+        parser.client.influx.close()
+    except Exception:
+        logger.exception("Error closing InfluxDB client.")
     logger.info("Parsed %d log line(s).", parser.parsed_lines)
     exit(0)
 

@@ -9,11 +9,22 @@ from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.organizations_api import OrganizationsApi
 from requests.exceptions import ConnectionError
 from influxdb_client.client.exceptions import InfluxDBError
-from influxdb_client.client.write_api import SYNCHRONOUS
+from influxdb_client.client.write_api import SYNCHRONOUS, WriteOptions
 
 from .influx_base import InfluxBase
 
 logger: Logger = logging.getLogger(__name__)
+
+class BatchingCallback:
+
+    def success(self, conf: tuple[str, str, str], data: str) -> None:
+        logger.debug("Written batch: %s, data: %s", conf, data)
+
+    def error(self, conf: tuple[str, str, str], data: str, exception: InfluxDBError) -> None:
+        logger.error("Cannot write batch: %s, data: %s due: %s", conf, data, exception)
+
+    def retry(self, conf: tuple[str, str, str], data: str, exception: InfluxDBError) -> None:
+        logger.warning("Retryable error occured for batch: %s, data: %s retry: %s", conf, data, exception)
 
 class InfluxClient(InfluxBase):
     def __init__(self, auto_init: bool = True) -> None:
@@ -37,6 +48,9 @@ class InfluxClient(InfluxBase):
             - INFLUXDB_V2_BUCKET
             - INFLUX_V2_RETENTION
             - INFLUXDB_V2_DEBUG
+            - INFLUXDB_V2_BATCHING
+            - INFLUXDB_V2_BATCH_SIZE
+            - INFLUXDB_V2_FLUSH_INTERVAL
         
         Args:
             auto_init (bool, optional): Whether to automatically setup the InfluxDB client. Defaults to True.
@@ -51,6 +65,9 @@ class InfluxClient(InfluxBase):
         self.org: str = os.getenv("INFLUXDB_V2_ORG", "geoip2influx")
         self.version: str|None = None
         self._setup_complete: bool = False
+        batching: bool = os.getenv("INFLUXDB_V2_BATCHING", "false").lower() == "true"
+        batch_size: int = int(os.getenv("INFLUXDB_V2_BATCH_SIZE", "10"))
+        flush_interval: int = int(os.getenv("INFLUXDB_V2_FLUSH_INTERVAL", "15000"))
         
         self.influx: InfluxDBClient | None = self.create_influx_client(debug=self.debug)
         
@@ -60,8 +77,22 @@ class InfluxClient(InfluxBase):
         self.logger.debug("InfluxDB token: %s", self.influx.token)
         self.logger.debug("InfluxDB bucket: %s", self.bucket)
         self.logger.debug("InfluxDB bucket retention seconds: %s", self.retention)
-    
-        self.write_api: WriteApi = self.influx.write_api(write_options=SYNCHRONOUS)
+        self.logger.debug("InfluxDB batching enabled: %s", batching)
+
+        if batching:
+            self.logger.debug("InfluxDB batch size: %s", batch_size)
+            self.logger.debug("InfluxDB flush interval: %s", flush_interval)
+            callback = BatchingCallback()
+            write_options: WriteOptions = WriteOptions(batch_size=batch_size, flush_interval=flush_interval)
+            self.write_api: WriteApi = self.influx.write_api(
+                write_options=write_options,
+                success_callback=callback.success,
+                error_callback=callback.error,
+                retry_callback=callback.retry
+                )
+        else:
+            write_options = SYNCHRONOUS
+            self.write_api: WriteApi = self.influx.write_api(write_options=write_options)
         self.bucket_api: BucketsApi = self.influx.buckets_api()
         self.org_api: OrganizationsApi = self.influx.organizations_api()
 

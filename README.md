@@ -26,22 +26,41 @@ Add the ones that differ on your system.
 | Environment Variable | Example Value | Description |
 | -------------------- | ------------- | ----------- |
 | NGINX_LOG_PATH | /config/log/nginx/access.log | Container path for Nginx logfile , defaults to the example. |
-| INFLUX_HOST | localhost | Host running InfluxDB. |
-| INFLUX_HOST_PORT | 8086 | Optional, defaults to 8086. |
-| INFLUX_DATABASE | geoip2influx | Optional, defaults to geoip2influx. |
-| INFLUX_USER | root | Optional, defaults to root. |
-| INFLUX_PASS | root | Optional, defaults to root. |
 | GEO_MEASUREMENT | geoip2influx | InfluxDB measurement name for geohashes. Optional, defaults to the example. |
 | LOG_MEASUREMENT | nginx_access_logs | InfluxDB measurement name for nginx logs. Optional, defaults to the example. |
 | SEND_NGINX_LOGS | true | Set to `false` to disable nginx logs. Optional, defaults to `true`. |
 | GEOIP2INFLUX_LOG_LEVEL | info | Sets the log level in geoip2influx.log. Use `debug` for verbose logging Optional, defaults to info. |
 | GEOIP2INFLUX_LOG_PATH | /config/log/geoip2influx/geoip2influx.log | Optional. Defaults to example. |
 | GEOIP_DB_PATH | /config/geoip2db/GeoLite2-City.mmdb | Optional. Defaults to example. |
-| INFLUX_RETENTION | 7d | Sets the retention for the database. Optional, defaults to example.|
-| INFLUX_SHARD | 1d | Set the shard for the database. Optional, defaults to example. |
 | MAXMINDDB_LICENSE_KEY | xxxxxxx | Add your Maxmind licence key |
 | MAXMINDDB_USER_ID | xxxxxxx| Add your Maxmind account id |
 
+**InfluxDB v1.8.x values**
+
+| Environment Variable | Example Value | Description |
+| -------------------- | ------------- | ----------- |
+| INFLUX_HOST | localhost | Host running InfluxDB. |
+| INFLUX_HOST_PORT | 8086 | Optional, defaults to 8086. |
+| INFLUX_DATABASE | geoip2influx | Optional, defaults to geoip2influx. |
+| INFLUX_USER | root | Optional, defaults to root. |
+| INFLUX_PASS | root | Optional, defaults to root. |
+| INFLUX_RETENTION | 7d | Sets the retention for the database. Optional, defaults to example.|
+| INFLUX_SHARD | 1d | Set the shard for the database. Optional, defaults to example. |
+
+**InfluxDB v2.x values**
+
+| Environment Variable | Example Value | Description |
+| -------------------- | ------------- | ----------- |
+| USE_INFLUX_V2 | true | Required if using InfluxDB2. Defaults to false |
+| INFLUXDB_V2_TOKEN | secret-token | Required |
+| INFLUXDB_V2_URL | http://localhost:8086 | Optional, defaults to http://localhost:8086 |
+| INFLUXDB_V2_ORG | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
+| INFLUXDB_V2_BUCKET | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
+| INFLUXDB_V2_RETENTION | 604800 | Optional, defaults to 604800. 7 days in seconds |
+| INFLUXDB_V2_DEBUG | false | Optional, defaults to false. Enables the debug mode for the influxdb-client package. |
+| INFLUXDB_V2_BATCHING | true | Optional, defaults to false. Enables batch writing of data. |
+| INFLUXDB_V2_BATCH_SIZE | 100 | Optional, defaults to 10. |
+| INFLUXDB_V2_FLUSH_INTERVAL | 30000 | Optional, defaults to 15000. How often in milliseconds to write a batch |
 
 ### MaxMind Geolite2
 
@@ -51,12 +70,14 @@ Get your licence key here: https://www.maxmind.com/en/geolite2/signup
 
 ### InfluxDB 
 
-#### InfluxDB v2.x is not supported. Use v1.8x. 
+#### InfluxDB v2.x and v1.8x is supported.
 
-The InfluxDB database will be created automatically with the name you choose.
+#### Note: The Grafana dashboard currently only supports InfluxDB v1.8.x
+
+The InfluxDB database/bucket and retention rules will be created automatically with the name you choose.
 
 ```
--e INFLUX_DATABASE=geoip2influx 
+-e INFLUX_DATABASE=geoip2influx or -e INFLUXDB_V2_BUCKET=geoip2influx
 ```
 
 ### Docker
@@ -99,12 +120,56 @@ services:
     restart: unless-stopped
 ```
 
+**InfluxDB2 examples**
+
+```bash
+docker create \
+  --name=geoip2influx \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Europe/Oslo \
+  -e INFLUXDB_V2_URL=<influxdb url> \
+  -e INFLUXDB_V2_TOKEN=<influxdb token> \
+  -e USE_INFLUX_V2=true \
+  -e MAXMINDDB_LICENSE_KEY=<license key>\
+  -e MAXMINDDB_USER_ID=<account id>\
+  -v /path/to/appdata/geoip2influx:/config \
+  -v /path/to/nginx/accesslog/:/config/log/nginx/ \
+  --restart unless-stopped \
+  ghcr.io/gilbn/geoip2influx
+```
+
+```yaml
+version: "2.1"
+services:
+  geoip2influx:
+    image: ghcr.io/gilbn/geoip2influx
+    container_name: geoip2influx
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Oslo
+      - INFLUXDB_V2_URL=<influxdb url>
+      - INFLUXDB_V2_TOKEN=<influxdb token>
+      - USE_INFLUX_V2=true
+      - MAXMINDDB_LICENSE_KEY=<license key>
+      - MAXMINDDB_USER_ID=<account id>
+    volumes:
+      - /path/to/appdata/geoip2influx:/config
+      - /path/to/nginx/accesslog/:/config/log/nginx/
+    restart: unless-stopped
+```
+
 ***
 
 ## Grafana dashboard: 
-### [Grafana Dashboard Link](https://grafana.com/grafana/dashboards/12268/)
 
-Needs the [grafana-worldmap-panel](https://grafana.com/grafana/plugins/grafana-worldmap-panel/?tab=installation)
+Use [nginx_logs_geo_map.json](/nginx_logs_geo_map.json)
+
+### Note
+
+Currently only supports InfluxDB 1.8.x.
+
 ***
 
 ## Sending Nginx log metrics
@@ -151,6 +216,8 @@ Then use the `/config/log/nginx/access.log` file in the `NGINX_LOG_PATH` variabl
 ***
 
 ## Updates 
+
+**10.08.24** - Add support for InfluxDB2. 
 
 **06.08.24** - Complete refactor of the python code. Deprecate the old geoip2influx.py file.
 

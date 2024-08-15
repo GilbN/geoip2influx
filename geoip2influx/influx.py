@@ -8,9 +8,11 @@ from influxdb import InfluxDBClient
 from requests.exceptions import ConnectionError
 from influxdb.exceptions import InfluxDBServerError, InfluxDBClientError
 
+from .influx_base import InfluxBase
+
 logger: Logger = logging.getLogger(__name__)
 
-class InfluxClient:
+class InfluxClient(InfluxBase):
     def __init__(self, auto_init: bool = True, **kwargs) -> None:
         """Initialize the InfluxDBClient.
         
@@ -35,6 +37,7 @@ class InfluxClient:
         Raises:
             ValueError: If the InfluxDB client is not properly configured.
         """
+
         self.host = kwargs.pop("host", None) or os.getenv("INFLUX_HOST", "localhost")
         self.port = kwargs.pop("port", None) or os.getenv("INFLUX_HOST_PORT", 8086)
         self.username = kwargs.pop("username", None) or os.getenv("INFLUX_USER", "root")
@@ -44,6 +47,7 @@ class InfluxClient:
         self.shard = kwargs.pop("shard", None) or os.getenv("INFLUX_SHARD", "1d")
         self.version: str|None = None
         self.retention_policy = f"{self.database} {self.retention}-{self.shard}"
+        self._setup_complete: bool = False
         
         self.logger = logging.getLogger("InfluxClient")
         self.logger.debug("InfluxDB host: %s", self.host)
@@ -60,9 +64,17 @@ class InfluxClient:
             database=self.database,
             **kwargs
         )
-        
+
         if auto_init:
             self.setup()
+
+    @property
+    def setup_complete(self) -> bool:
+        return self._setup_complete
+
+    @setup_complete.setter
+    def setup_complete(self, value: bool) -> None:
+        self._setup_complete = value
 
     def setup(self):
         """Setup the database and retention policy, and validate the setup."""
@@ -71,14 +83,16 @@ class InfluxClient:
         self.create_retention_policy()
         self.validate()
         self.logger.success("InfluxDB client setup complete.")
+        self.setup_complete = True
         
     def create_influx_client(self, **kwargs) -> InfluxDBClient | None:
         try:
             return InfluxDBClient(**kwargs)
         except Exception:
             self.logger.exception("Error creating InfluxDB client.")
-            
-    def test_connection(self):
+            raise
+
+    def test_connection(self) -> None:
         try:
             self.version: str = self.influx.ping()
             self.logger.debug("InfluxDB version: %s", self.version)

@@ -16,6 +16,7 @@ from IPy import IP
 
 from .constants import ipv4_pattern, ipv6_pattern, MONITORED_IP_TYPES, ipv4, ipv6
 from .influx import InfluxClient
+from .influxv2 import InfluxClient as InfluxClientV2
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +51,11 @@ class LogParser:
         self.geo_measurement = os.getenv("GEO_MEASUREMENT", "geoip2influx")
         self.log_measurement = os.getenv("LOG_MEASUREMENT", "nginx_access_logs")
         self.send_logs: bool = os.getenv("SEND_NGINX_LOGS", "true").lower() == "true"
-       
+
+        use_influx_v2: bool = os.getenv("USE_INFLUX_V2", "false").lower() == "true"
+        
         self.hostname: str = socket.gethostname()
-        self.client = InfluxClient(auto_init)
+        self.client: InfluxClient | InfluxClientV2 = InfluxClientV2(auto_init) if use_influx_v2 else InfluxClient(auto_init)
         self.geoip_reader: None|Reader = None
         self.current_log_inode: int|None = None
         self.parsed_lines: int = 0
@@ -71,7 +74,8 @@ class LogParser:
     def setup(self) -> None:
         """Setup the necessary components before running the log parser."""
         self.geoip_reader = Reader(self.geoip_path)
-        self.client.setup()
+        if not self.client.setup_complete:
+            self.client.setup()
     
     def validate_log_line(self, log_line: str) -> re.Match[str] | None:
         """Validate the log line against the IPv4 and IPv6 patterns."""

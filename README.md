@@ -51,7 +51,7 @@ Add the ones that differ on your system.
 
 | Environment Variable | Example Value | Description |
 | -------------------- | ------------- | ----------- |
-| USE_INFLUX_V2 | true | Required if using InfluxDB2. Defaults to false |
+| USE_INFLUXDB_V2 | true | Required if using InfluxDB2. Defaults to false |
 | INFLUXDB_V2_TOKEN | secret-token | Required |
 | INFLUXDB_V2_URL | http://localhost:8086 | Optional, defaults to http://localhost:8086 |
 | INFLUXDB_V2_ORG | geoip2influx | Optional, defaults to geoip2influx. Will be created if not exists. |
@@ -130,7 +130,7 @@ docker create \
   -e TZ=Europe/Oslo \
   -e INFLUXDB_V2_URL=<influxdb url> \
   -e INFLUXDB_V2_TOKEN=<influxdb token> \
-  -e USE_INFLUX_V2=true \
+  -e USE_INFLUXDB_V2=true \
   -e MAXMINDDB_LICENSE_KEY=<license key>\
   -e MAXMINDDB_USER_ID=<account id>\
   -v /path/to/appdata/geoip2influx:/config \
@@ -151,7 +151,7 @@ services:
       - TZ=Europe/Oslo
       - INFLUXDB_V2_URL=<influxdb url>
       - INFLUXDB_V2_TOKEN=<influxdb token>
-      - USE_INFLUX_V2=true
+      - USE_INFLUXDB_V2=true
       - MAXMINDDB_LICENSE_KEY=<license key>
       - MAXMINDDB_USER_ID=<account id>
     volumes:
@@ -216,6 +216,8 @@ Then use the `/config/log/nginx/access.log` file in the `NGINX_LOG_PATH` variabl
 ***
 
 ## Updates 
+
+**18.08.24** - Rename env from USE_INFLUX_V2 to USE_INFLUXDB_V2.
 
 **10.08.24** - Add support for InfluxDB2. 
 

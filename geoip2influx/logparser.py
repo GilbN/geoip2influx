@@ -52,10 +52,10 @@ class LogParser:
         self.log_measurement = os.getenv("LOG_MEASUREMENT", "nginx_access_logs")
         self.send_logs: bool = os.getenv("SEND_NGINX_LOGS", "true").lower() == "true"
 
-        use_influx_v2: bool = os.getenv("USE_INFLUX_V2", "false").lower() == "true"
+        use_influxdb_v2: bool = os.getenv("USE_INFLUXDB_V2", "false").lower() == "true"
         
         self.hostname: str = socket.gethostname()
-        self.client: InfluxClient | InfluxClientV2 = InfluxClientV2(auto_init) if use_influx_v2 else InfluxClient(auto_init)
+        self.client: InfluxClient | InfluxClientV2 = InfluxClientV2(auto_init) if use_influxdb_v2 else InfluxClient(auto_init)
         self.geoip_reader: None|Reader = None
         self.current_log_inode: int|None = None
         self.parsed_lines: int = 0

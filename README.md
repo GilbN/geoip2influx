@@ -62,6 +62,13 @@ Add the ones that differ on your system.
 | INFLUXDB_V2_BATCH_SIZE | 100 | Optional, defaults to 10. |
 | INFLUXDB_V2_FLUSH_INTERVAL | 30000 | Optional, defaults to 15000. How often in milliseconds to write a batch |
 
+#### INFLUXDB_V2_TOKEN
+
+If the organization or bucket does not exist, it will try and create them with the token.
+
+> [!NOTE]
+> The minimim level of rights needed is write access to the bucket.
+
 ### MaxMind Geolite2
 
 Default download location is `/config/geoip2db/GeoLite2-City.mmdb`

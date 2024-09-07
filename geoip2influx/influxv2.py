@@ -163,7 +163,6 @@ class InfluxClient(InfluxBase):
                 self.logger.info("Bucket %s created.", self.bucket)
         except Exception:
             self.logger.exception("Error creating bucket %s.", self.bucket)
-            raise
     
     def bucket_exists(self) -> bool:
         """Check if the bucket exists."""
@@ -176,7 +175,6 @@ class InfluxClient(InfluxBase):
             return False
         except Exception:
             self.logger.exception("Error checking bucket %s.", self.bucket)
-            raise
     
     def create_org(self) -> None:
         """Create the organization if it does not exist."""
@@ -189,7 +187,6 @@ class InfluxClient(InfluxBase):
                 self.logger.info("Organization %s created.", self.org)
         except Exception:
             self.logger.exception("Error creating organization %s.", self.org)
-            raise
         
     def org_exists(self) -> bool:
         """Check if the organization exists."""
@@ -202,4 +199,3 @@ class InfluxClient(InfluxBase):
             return False
         except Exception:
             self.logger.exception("Error checking organization %s.", self.org)
-            raise

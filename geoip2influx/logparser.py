@@ -301,7 +301,7 @@ class LogParser:
         try:
             log_data_fields['connect_time'] = float(datadict['connect_time']) if datadict['connect_time'] != '-' else 0.0
         except ValueError:
-            log_data_fields['connect_time'] = str(datadict['connect_time'])
+            log_data_fields['connect_time'] = 0.0
         log_data_tags['ip'] = datadict['ipaddress']
         log_data_tags['datetime'] = datetime.strptime(datadict['dateandtime'], '%d/%b/%Y:%H:%M:%S %z')
         log_data_tags['remote_user'] = datadict['remote_user']

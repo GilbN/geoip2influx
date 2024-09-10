@@ -9,6 +9,7 @@ from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.organizations_api import OrganizationsApi
 from requests.exceptions import ConnectionError
 from influxdb_client.client.exceptions import InfluxDBError
+from influxdb_client.rest import ApiException
 from influxdb_client.client.write_api import SYNCHRONOUS, WriteOptions
 
 from .influx_base import InfluxBase
@@ -125,7 +126,7 @@ class InfluxClient(InfluxBase):
     def test_connection(self) -> None:
         try:
             if not self.influx.ping():
-                raise
+                raise ConnectionError("InfluxDB ping failed")
             self.version: str = self.influx.version()
             self.logger.debug("InfluxDB version: %s", self.version)
         except Exception:
@@ -155,23 +156,25 @@ class InfluxClient(InfluxBase):
         try:
             if self.bucket_exists():
                 return
-            self.logger.info("Creating bucket.")
+            self.logger.debug("Trying to create bucket '%s'.", self.bucket)
             bucket_description: str = f"Bucket for storing GeoIP data for {self.bucket}"
             bucket_retention = BucketRetentionRules(type="expire",every_seconds=self.retention)
             self.bucket_api.create_bucket(bucket_name=self.bucket, org=self.org, description=bucket_description, retention_rules=bucket_retention)
             if self.bucket_exists():
-                self.logger.info("Bucket %s created.", self.bucket)
+                self.logger.info("Bucket '%s' created.", self.bucket)
+        except InfluxDBError as exc:
+            if "Are you using token with sufficient permission?" in exc.message:
+                self.logger.debug("Not authorized to create buckets")
         except Exception:
             self.logger.exception("Error creating bucket %s.", self.bucket)
     
     def bucket_exists(self) -> bool:
         """Check if the bucket exists."""
         try:
-            buckets = self.bucket_api.find_buckets_iter(org=self.org)
-            if buckets and self.bucket in [bucket.name for bucket in buckets]:
-                self.logger.debug("Bucket %s exists.", self.bucket)
+            if self.bucket_api.find_bucket_by_name(self.bucket):
+                self.logger.debug("Bucket '%s' exists.", self.bucket)
                 return True
-            self.logger.debug("Bucket %s does not exist.", self.bucket)
+            self.logger.debug("Bucket '%s' does not exist or no read permissions", self.bucket)
             return False
         except Exception:
             self.logger.exception("Error checking bucket %s.", self.bucket)
@@ -181,21 +184,26 @@ class InfluxClient(InfluxBase):
         if self.org_exists():
             return
         try:
-            self.logger.info("Creating organization.")
+            self.logger.debug("Trying to create organization '%s'.", self.org)
             self.org_api.create_organization(name=self.org)
             if self.org_exists():
-                self.logger.info("Organization %s created.", self.org)
+                self.logger.info("Organization '%s' created.", self.org)
+        except ApiException as exc:
+            if exc.reason == "Unauthorized":
+                self.logger.debug("Not authorized to create organizations")
+            else:
+                self.logger.exception("Error creating organization '%s'.")
         except Exception:
-            self.logger.exception("Error creating organization %s.", self.org)
+            self.logger.exception("Error creating organization '%s'.", self.org)
         
     def org_exists(self) -> bool:
         """Check if the organization exists."""
         try:
             orgs = self.org_api.find_organizations(org=self.org)
             if orgs and self.org in [org.name for org in orgs]:
-                self.logger.debug("Organization %s exists.", self.org)
+                self.logger.debug("Organization '%s' exists.", self.org)
                 return True
-            self.logger.debug("Organization %s does not exist.", self.org)
+            self.logger.debug("Organization '%s' does not exist or no read permissions", self.org)
             return False
         except Exception:
-            self.logger.exception("Error checking organization %s.", self.org)
+            self.logger.exception("Error reading organization '%s'.", self.org)

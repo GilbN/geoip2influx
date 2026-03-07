@@ -98,7 +98,7 @@
       "collapsed": false,
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(GEOIP2)}"
+        "uid": "$datasource"
       },
       "gridPos": {
         "h": 1,
@@ -281,7 +281,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(GEOIP2)}"
+            "uid": "$datasource"
           },
           "groupBy": [
             {
@@ -1374,7 +1374,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "${DS_INFLUXDB_(GEOIP2)}"
+            "uid": "$datasource"
           },
           "groupBy": [
             {
@@ -2141,7 +2141,7 @@
       "collapsed": false,
       "datasource": {
         "type": "influxdb",
-        "uid": "${DS_INFLUXDB_(GEOIP2)}"
+        "uid": "$datasource"
       },
       "gridPos": {
         "h": 1,

@@ -1,6 +1,8 @@
 # [Geoip2Influx](https://github.com/gilbN/geoip2influx)
 
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/gilbn/geoip2influx?style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx/builds)
+# This project has been superseeded by [GeoMetrikks](https://github.com/GilbN/geometrikks)
+
+
 [![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://hub.docker.com/r/gilbn/geoip2influx)
 [![GitHub](https://img.shields.io/github/license/gilbn/geoip2influx?color=blue&style=for-the-badge)](https://github.com/gilbN/geoip2influx/blob/master/LICENSE)
